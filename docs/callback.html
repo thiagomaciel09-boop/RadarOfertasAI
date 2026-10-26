@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Nao envia o endereco desta pagina (com o code) para outros sites. -->
+<meta name="referrer" content="no-referrer">
+<title>RadarOfertas AI - Autorização</title>
+<style>
+  :root { --bg: #f6f7f9; --card: #fff; --text: #1d2330; --muted: #5b6475; --accent: #2563eb; --err: #b42318; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #12151b; --card: #1c212b; --text: #e6e9ef; --muted: #9aa3b5; --accent: #6b9cff; --err: #ff8a80; }
+  }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 560px; margin: 48px auto; padding: 24px 16px; background: var(--card); border-radius: 12px; }
+  h1 { font-size: 1.3rem; margin-top: 0; }
+  p { color: var(--muted); }
+  textarea { width: 100%; box-sizing: border-box; font: 14px monospace; padding: 8px; border-radius: 8px; }
+  button { margin-top: 8px; padding: 8px 16px; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font-size: 1rem; cursor: pointer; }
+  .erro { color: var(--err); }
+</style>
+</head>
+<body>
+<main>
+  <h1>RadarOfertas AI</h1>
+  <div id="ok" hidden>
+    <p>Autorização recebida. Copie o texto abaixo e cole no terminal onde o script do RadarOfertas AI está esperando.</p>
+    <textarea id="resultado" rows="3" readonly></textarea>
+    <button id="copiar" type="button">Copiar</button>
+    <p>O código vale por poucos minutos e só pode ser usado uma vez. Esta página não guarda nem envia nada.</p>
+  </div>
+  <div id="falha" hidden>
+    <p class="erro" id="mensagem"></p>
+  </div>
+</main>
+<script>
+  // Esta pagina so mostra o "code" recebido do Mercado Livre.
+  // A troca do code pelos tokens acontece no script local.
+  var params = new URLSearchParams(window.location.search);
+  var code = params.get("code");
+  var state = params.get("state");
+  var erro = params.get("error");
+
+  if (code && state) {
+    document.getElementById("resultado").value =
+      "code=" + encodeURIComponent(code) + "&state=" + encodeURIComponent(state);
+    document.getElementById("ok").hidden = false;
+  } else {
+    document.getElementById("mensagem").textContent = erro
+      ? "A autorização não foi concluída: " + erro
+      : "Nenhum código de autorização encontrado no endereço.";
+    document.getElementById("falha").hidden = false;
+  }
+
+  // Tira o code da barra de endereco e do historico do navegador.
+  window.history.replaceState(null, "", window.location.pathname);
+
+  document.getElementById("copiar").addEventListener("click", function () {
+    var campo = document.getElementById("resultado");
+    campo.select();
+    navigator.clipboard.writeText(campo.value).then(function () {
+      document.getElementById("copiar").textContent = "Copiado!";
+    });
+  });
+</script>
+</body>
+</html>
